@@ -859,8 +859,8 @@
         | to redirect to (in a new tab).
         |
         */
-	// $conf['help_url'] = '';
-	// $conf['help_url'] = 'https://path/to/help';
+	// $conf['help_url'] = ''; //This will default to the Wiki page
+	// $conf['help_url'] = 'https://path/to/help'; //This will default to the specified URL
 
 	/*
 	|===============================================
