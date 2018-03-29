@@ -207,4 +207,8 @@
 			</table>
 		</div>
 
+		<div class="col-lg-4">
+			<h4><i class="fa fa-location-arrow fa-fixed"></i> <span data-i18n="client.status"></span></h4>
+			<div class="status" data-section="status"></div>
+		</div>
 	</div><!-- /row -->

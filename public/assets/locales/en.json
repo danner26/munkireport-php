@@ -107,6 +107,7 @@
         "hour": "Clients per hour",
         "panel_title": "Client activity in the last month",
         "report": "Client Report",
+        "status": "Machine Status",
         "tab": {
             "summary": "Summary"
         },
@@ -143,7 +144,11 @@
         },
         "ok": "Ok",
         "ok_remove": "Ok, Remove",
-        "save": "Save"
+        "save": "Save",
+        "status": {
+            "add": "Add Status",
+            "label": "Status"
+        }
     },
     "disabled": "Disabled",
     "disconnected": "Disconnected",
