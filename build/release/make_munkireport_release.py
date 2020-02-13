@@ -13,7 +13,7 @@
 # Requires an OAuth token with push access to the repo. Currently the GitHub
 # Releases API is in a 'preview' status, and this script does very little error
 # handling.
-'''See docstring for main() function'''
+"""See docstring for main() function."""
 
 import json
 import optparse
@@ -31,7 +31,7 @@ from shutil import rmtree
 from time import strftime
 
 class GitHubAPIError(BaseException):
-    '''Base error for GitHub API interactions'''
+    """Base error for GitHub API interactions."""
     pass
 
 
@@ -111,17 +111,16 @@ def run_command(cmd):
     subprocess.check_call(cmd)
 
 def main():
-    """Builds and pushes a new munkireport-php release from an existing Git clone
-of munkireport-php.
+    """Builds and pushes a new munkireport-php release from an existing Git
+    clone of munkireport-php.
 
-Requirements:
+    Requirements:
 
-API token:
-You'll need an API OAuth token with push access to the repo. You can create a
-Personal Access Token in your user's Account Settings:
-https://github.com/settings/applications
-
-"""
+    API token:
+    You'll need an API OAuth token with push access to the repo. You can create a
+    Personal Access Token in your user's Account Settings:
+    https://github.com/settings/applications
+    """
     usage = __doc__
     parser = optparse.OptionParser(usage=usage)
     parser.add_option('-t', '--token',
@@ -221,26 +220,7 @@ https://github.com/settings/applications
     if not match:
         sys.exit("Couldn't extract release notes for this version!")
     release_notes = match.group('current_ver_notes')
-    
-    # install dependencies
-    run_command(['composer', 'install', '--no-dev',
-        '--ignore-platform-reqs', '--optimize-autoloader'])
 
-    # also install all suggested packages
-    data = json.load(open('composer.json'))
-    for key, value in  data['suggest'].iteritems():
-        version = get_version_from_string(value)
-        pkg = "%s:%s" % (key, version)
-        run_command(['composer', 'require', '--update-no-dev',
-                '--ignore-platform-reqs', '--optimize-autoloader', pkg])
-
-    # zip up
-    print "Zipping up the repository.."
-    zip_file = 'munkireport-%s.zip' % current_version
-    run_command(['zip', '-r', zip_file, '.', '--exclude', '.git*', '-q'])
-    with open(zip_file, 'rb') as fdesc:
-        zip_data = fdesc.read()
-        
     # prepare release metadata
     release_data = dict()
     release_data['tag_name'] = tag_name
@@ -261,26 +241,6 @@ https://github.com/settings/applications
             print "Release successfully created. Server response:"
             pprint(create_release)
             print
-
-            # upload the pkg as a release asset
-            new_release_id = create_release['id']
-            endpoint = ('/repos/%s/%s/releases/%s/assets?name=%s'
-                        % (publish_user,
-                           publish_repo,
-                           new_release_id,
-                           zip_file))
-            upload_asset = api_call(
-                endpoint,
-                token,
-                baseurl='https://uploads.github.com',
-                data=zip_data,
-                json_data=False,
-                additional_headers={'Content-Type': 'application/octet-stream'})
-            if upload_asset:
-                print ("Successfully attached .zip release asset. Server "
-                       "response:")
-                pprint(upload_asset)
-                print
 
     # increment version
     print "Incrementing version to %s.." % next_version

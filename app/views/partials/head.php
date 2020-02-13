@@ -2,6 +2,7 @@
 <html class="no-js" lang="en">
 
 <head>
+	<meta name=apple-mobile-web-app-capable content=yes>
 	<meta content="text/html; charset=utf-8" http-equiv="content-type" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -35,6 +36,7 @@
 	<script>
 		var baseUrl = "<?php echo conf('subdirectory'); ?>",
 			appUrl = "<?php echo rtrim(url(), '/'); ?>",
+			default_theme = "<?php echo conf('default_theme'); ?>",
 			businessUnitsEnabled = <?php echo conf('enable_business_units') ? 'true' : 'false'; ?>;
 			isAdmin = <?php echo $_SESSION['role'] == 'admin' ? 'true' : 'false'; ?>;
 			isManager = <?php echo $_SESSION['role'] == 'manager' ? 'true' : 'false'; ?>;
@@ -54,8 +56,8 @@
 
 	<?php if( isset($_SESSION['user'])):?>
 	<?php $modules = getMrModuleObj()->loadInfo(); ?>
-
-
+	<?php $dashboard = getDashboard()->loadAll();?>
+	
 <header class="navbar navbar-default navbar-static-top bs-docs-nav" role="banner">
 	<div class="container">
 		<div class="navbar-header">
@@ -70,13 +72,39 @@
 		<nav class="collapse navbar-collapse bs-navbar-collapse" role="navigation">
 			<ul class="nav navbar-nav">
 				<?php $page = $GLOBALS[ 'engine' ]->get_uri_string(); ?>
-
+				
+				<?php if($dashboard->getCount() === 1):?>
 				<li <?php echo $page==''?'class="active"':''; ?>>
 					<a href="<?php echo url(); ?>">
 						<i class="fa fa-th-large"></i>
 						<span class="visible-lg-inline" data-i18n="nav.main.dashboard"></span>
 					</a>
 				</li>
+				<?php else:?>
+					<?php $url = 'show/dashboard/'; ?>
+					<li class="dropdown<?php echo strpos($page, $url)===0?' active':''; ?>">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+							<i class="fa fa-th-large"></i>
+							<span data-i18n="nav.main.dashboard_plural"></span>
+							<b class="caret"></b>
+						</a>
+						<ul class="dashboard dropdown-menu">
+
+							<?php foreach($dashboard->getDropdownData('show/dashboard', $page) as $item): ?>
+
+								<li class="<?=$item->class?>">
+									<a href="<?=$item->url?>">
+										<span class="pull-right"><?=strtoupper($item->hotkey)?></span>
+										<span class="dropdown-link-text "><?=$item->display_name?></span>
+									</a>
+								</li>
+
+							<?php endforeach; ?>
+
+						</ul>
+
+					</li>
+				<?php endif?>
 
 				<?php $url = 'show/reports/'; ?>
 				<li class="dropdown<?php echo strpos($page, $url)===0?' active':''; ?>">
@@ -149,7 +177,7 @@
 				<?php endif?>
 
 				<li>
-					<a href="#" class="filter-popup">
+					<a href="#" id="filter-popup" class="filter-popup">
 						<i class="fa fa-filter"></i>
 					</a>
 				</li>
@@ -216,6 +244,16 @@
 					</ul>
 				</li>
 
+				<?php endif; ?>
+
+				<?php if(conf('show_help')):?>
+				
+				<li>
+						<a href="<?php echo conf('help_url');?>" target="_blank">
+								<i class="fa fa-question"></i>
+						</a>
+				</li>
+				
 				<?php endif; ?>
 
 			</ul>

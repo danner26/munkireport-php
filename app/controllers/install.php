@@ -3,6 +3,9 @@
 namespace munkireport\controller;
 
 use \Controller, \View;
+use League\Flysystem\Filesystem;
+use League\Flysystem\Adapter\Local;
+
 
 class Install extends Controller
 {
@@ -35,14 +38,15 @@ class Install extends Controller
 
         switch ($format) {
             case 'config':
-                $str = implode("','", $modules);
-                echo "\$conf['modules'] = array('$str');\n";
-                break;
-            case 'json':
+            case 'env':
+                $str = implode(', ', $modules);
+                echo "MODULES=\"$str\"";
                 break;
             case 'autopkg':
                 $obj = new View();
                 $obj->view('install/modules_autopkg', array('modules' => $modules));
+                break;
+            case 'json':
                 break;
             default:
                 echo implode("\n", $modules);
@@ -117,5 +121,32 @@ class Install extends Controller
     {
         $obj = new View();
         $obj->view('install/install_plist');
+    }
+
+    public function get_paths()
+    {
+        $adapter = new Local(PUBLIC_ROOT.'assets/client_installer/payload/');
+        $filesystem = new Filesystem($adapter);
+        $contents = $filesystem->listContents('', true);
+        foreach($contents as $fileObj){
+            if($this->is_regular_file($fileObj)){
+                echo "/" . $fileObj['path'] . "\n";
+            }
+        }
+    }
+
+    private function is_regular_file($fileObj)
+    {
+        if($fileObj['type'] != 'file'){
+            return false;
+        }
+        if($fileObj['basename'][0] == '.'){
+            return false;
+        }
+        // Don't accept @ in path - Synology I'm looking at you
+        if(strpos($fileObj['path'], '@') !== false){
+            return false;
+        }
+        return true;
     }
 }

@@ -36,12 +36,12 @@ class Database extends Controller
             $migrator = new Migrator($repository, $this->capsule->getDatabaseManager(), $files);
             $dirs = [APP_ROOT . 'database/migrations'];
             $this->appendModuleMigrations($dirs);
-            $migrationFiles = $migrator->run($dirs, Array('pretend' => true));
+            //$migrationFiles = $migrator->run($dirs, Array('pretend' => true));
             $migrationFilenames = Array();
 
-            foreach ($migrationFiles as $mf) {
-                $migrationFilenames[] = basename($mf);
-            }
+//            foreach ($migrationFiles as $mf) {
+//                $migrationFilenames[] = basename($mf);
+//            }
 
 
             $obj = new View();
@@ -52,8 +52,7 @@ class Database extends Controller
         } catch (\Exception $e) {
             $obj = new View();
             $obj->view('json', array('msg' => Array(
-                'error' => true,
-                'error_message' => $e->getMessage(),
+                'error' => $e->getMessage(),
                 'error_trace' => $e->getTrace()
             )));
         }
@@ -74,32 +73,33 @@ class Database extends Controller
             $this->appendModuleMigrations($dirs);
 
             $obj = new View();
+            
+            $input = new \Symfony\Component\Console\Input\StringInput('');
+            $outputSymfony = new \Symfony\Component\Console\Output\BufferedOutput();
+            $outputStyle = new \Illuminate\Console\OutputStyle($input, $outputSymfony);
 
             try {
-                $migrationFiles = $migrator->run($dirs, ['pretend' => false]);
+                $migrationFiles = $migrator->setOutput($outputStyle)->run($dirs, ['pretend' => false]);
 
                 $obj->view('json', [
                     'msg' => [
                         'files' => $migrationFiles,
-                        'notes' => $migrator->getNotes()
+                        'notes' => explode(PHP_EOL, $outputSymfony->fetch()),
                     ]
                 ]);
             } catch (\PDOException $exception) {
                 $obj->view('json', [
                     'msg' => [
-                        'notes' => $migrator->getNotes(),
-                        'error' => $exception->getMessage()
+                        'error' => $exception->getMessage(),
+                        'notes' => explode(PHP_EOL, $outputSymfony->fetch()),
                     ]
                 ]);
             }
         } catch (\Exception $e) {
             $obj = new View();
             $obj->view('json', [
-                'msg' => [
-                    'error' => true,
-                    'error_message' => $e->getMessage(),
+                    'error' => $e->getMessage(),
                     'error_trace' => $e->getTrace()
-                ]
             ]);
         }
     }

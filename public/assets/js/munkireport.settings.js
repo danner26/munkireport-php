@@ -47,6 +47,13 @@ var mr = {
             var globalPrefs = mr.state('global') || {};
             return globalPrefs[key];
         },
+        
+        setHotKey: function(key, url){
+          $(document).bind('keydown', key, function(){
+              window.location = url;
+              return true;
+          });
+        },
 
         // Integer or integer string OS Version to semantic OS version
         integerToVersion: function(osvers)
@@ -63,6 +70,117 @@ var mr = {
         		osvers = osvers.match(/.{2}/g).map(function(x){return +x}).join('.')
             }
             return osvers
+        },
+
+        listingFilter: {
+            filter: function(d, filters){
+                for (var i = 0; i < filters.length; i++) {
+                    var filterObj = filters[i];
+                    if (typeof window[filterObj.filter] === "function"){
+                        // Use filter from Global Space
+                        window[filterObj.filter](filterObj.column, d);
+                    }else if(this[filterObj.filter]){
+                        this[filterObj.filter](filterObj.column, d);
+                    }
+                }
+            },
+            osFilter: function(col, d){
+                // OS version
+                if(d.search.value.match(/^\d+\.\d+(\.(\d+)?)?$/)){
+                    var search = d.search.value.split('.').map(function(x){return ('0'+x).slice(-2)}).join('');
+                    d.search.value = search;
+                }
+            },
+            columnNameFilter: function(col, d){
+                var colData = d.columns[col];
+                if(colData.name ==  d.search.value){
+                    colData.search.value = '> 0';
+                    d.search.value = '';
+                }
+            }
+        },
+
+        listingFormatter: {
+            formatters: [],
+            numFormatters: 0,
+            tabLinks: [],
+            setFormatters: function(formatters){
+                this.formatters = formatters
+                this.numFormatters = formatters.length
+                this.tablink = this.initTabLinks()
+            },
+            initTabLinks: function(){
+                var headers = $('th[data-colname]');
+                for (var i = 0; i < headers.length; i++) {
+                    var head = $(headers[i])
+                    this.tabLinks.push(
+                        head.data('tab-link') ? '#tab_'+head.data('tab-link') : ''
+                    )
+                }
+            },
+            getTabLink: function(col){
+                return this.tabLinks[col]
+            },
+            format: function(row){
+                if (this.numFormatters) {
+                    for (var i = 0; i < this.numFormatters; i++) {
+                        colFormatter = this.formatters[i]
+                        if(this[colFormatter.formatter]){
+                            this[colFormatter.formatter](colFormatter.column, row);
+                        }else if (typeof window[colFormatter.formatter] === "function"){
+                            // Use formatter from Global Space
+                            window[colFormatter.formatter](colFormatter.column, row);
+                        }
+                    }
+                }
+            },
+            clientDetail: function(col, row){
+                // Update name in first column to link
+                var cell=$('td:eq('+col+')', row);
+                var name=cell.text() || "No Name";
+                var sn=$('td:eq('+(col+1)+')', row).text();
+                cell.html(
+                    mr.getClientDetailLink(name, sn, this.getTabLink(col))
+                );
+            },
+            timestampToMoment: function(col, row){
+                var cell = $('td:eq('+col+')', row)
+                var checkin = parseInt(cell.text());
+                var date = new Date(checkin * 1000);
+                cell.html('<span title="'+date+'">'+moment(date).fromNow()+'</span>');
+            },
+            binaryYesNo: function(col, row){
+                var cell = $('td:eq('+col+')', row),
+                    value = cell.text()
+                value = value == '1' ? i18n.t('yes') :
+                    (value === '0' ? i18n.t('no') : '')
+	        	cell.text(value)
+            },
+            binaryEnabledDisabled: function(col, row){
+                var cell = $('td:eq('+col+')', row),
+                    value = cell.text()
+                value = value == '1' ? '<span class="label label-success">'+i18n.t('enabled')+'</span>' :
+                    (value === '0' ? '<span class="label label-danger">'+i18n.t('disabled')+'</span>' : '')
+	        	cell.html(value)
+            },
+            fileSize: function(col, row){
+                var cell = $('td:eq('+col+')', row)
+                var fs=cell.text();
+                cell.addClass('text-right').text(fileSize(fs, 0));
+            },
+            upperCase: function(col, row){
+                var cell = $('td:eq('+col+')', row)
+                cell.addClass('text-uppercase')
+            },
+            osVersion: function(col, row){
+                // Format OS Version
+                var cell = $('td:eq('+col+')', row),
+	        	    osvers = cell.text();
+	        	if( osvers > 0 && osvers.indexOf(".") == -1){
+	        	     osvers = osvers.match(/.{2}/g).map(function(x){return +x}).join('.')
+	        	}
+	        	cell.text(osvers)
+            }
         },
 
         // Get client detail link
@@ -214,7 +332,7 @@ var mr = {
 
         loadTheme: function() {
             // Get global state
-            var theme = mr.getPref('theme') || 'Default';
+            var theme = mr.getPref('theme') || default_theme;
             var theme_dir = baseUrl + 'assets/themes/' + theme + '/';
             var theme_file = theme_dir + 'bootstrap.min.css';
             $('#bootstrap-stylesheet').attr('href', theme_dir + 'bootstrap.min.css');
@@ -236,55 +354,15 @@ var mr = {
             	var an = $(a).find('a').text(),
             		bn = $(b).find('a').text();
 
-            	if(an > bn) {
+            	if(an.toLowerCase() > bn.toLowerCase()) {
             		return 1;
             	}
-            	if(an < bn) {
+            	if(an.toLowerCase() < bn.toLowerCase()) {
             		return -1;
             	}
             	return 0;
             });
 
             $itemsli.detach().appendTo($menu);
-        },
-
-        // Lookup table for display vendors
-        display_vendors : {
-            "610": "Apple",
-            "10ac": "Dell",
-            "5c23": "Wacom",
-            "4d10": "Sharp",
-            "1e6d": "LG",
-            "38a3": "NEC",
-            "4c49": "SMART Technologies",
-            "9d1": "BenQ",
-            "4dd9": "Sony",
-            "472": "Acer",
-            "22f0": "HP",
-            "34ac": "Mitsubishi",
-            "5a63": "ViewSonic",
-            "4c2d": "Samsung",
-            "593a": "Vizio",
-            "d82": "CompuLab",
-            "3023": "LaCie",
-            "3698": "Matrox",
-            "4ca3": "Epson",
-            "170e": "Extron",
-            "e11": "Compaq",
-            "24d3": "ASK Proxima",
-            "410c": "Philips",
-            "15c3": "Eizo",
-            "26cd": "iiyama",
-            "7fff": "Haier",
-            "3e8d": "Optoma",
-            "5262": "Toshiba",
-            "34a9": "Panasonic",
-            "5e3": "Flanders Scientific",
-            "30ae": "Lenovo",
-            "469": "Asus",
-            "4249": "Insignia",
-            "41d2": "Planar",
-            "5c85": "Westinghouse"
         }
-
     };

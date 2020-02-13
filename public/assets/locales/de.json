@@ -104,7 +104,7 @@
         "clients": "Clients",
         "comment": "Kommentar",
         "hour": "Clients pro Stunde",
-        "panel_title": "Clientaktivität im letzten Monat",
+        "panel_title": "Clientaktivität im letzten __number__ Tage",
         "report": "Client Report",
         "tab": {
             "summary": "Zusammenfassung"
@@ -224,7 +224,6 @@
             "title": "Uptime"
         }
     },
-    "memory": "Speicher",
     "model": "Modell",
     "mouse": "Maus",
     "munki": {
@@ -302,6 +301,7 @@
         "soap": "SOAP Extension (wird für GSX Modul gebraucht)",
         "version": "Version"
     },
+    "physical_memory": "Speicher",
     "pkg_failed_to_install": "__pkg__ wurde nicht installiert: __reason__",
     "pkg_failed_to_install_plural": "__count__ Pakete wurden nicht installiert",
     "ratio": "Verhältnis",

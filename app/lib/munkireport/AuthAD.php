@@ -2,16 +2,23 @@
 
 namespace munkireport\lib;
 
-use \Adldap\Adldap, \Exception;
-
+use Adldap\Adldap;
+use Adldap\Schemas\ActiveDirectory as ActiveDirectorySchema;
+use \Exception;
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
 
 class AuthAD extends AbstractAuth
 {
-    private $config, $groups, $login, $auth_status;
+    private $config, $schema, $groups, $login, $authStatus;
 
     public function __construct($config)
     {
         $this->config = $config;
+        // Schema support
+        $schemaName = 'Adldap\\Schemas\\'.$this->config['schema'];
+        $this->schema = new $schemaName;
+        $this->config['schema'] = $schemaName;
         $this->groups = [];
     }
 
@@ -19,15 +26,35 @@ class AuthAD extends AbstractAuth
     {
         $this->login = $login;
         if ($login && $password) {
+          
+            if (conf('debug'))
+            {
+                $logger = new Logger('AUTH_AD');
+                $logger->pushHandler(new StreamHandler(APP_ROOT.'/storage/logs/auth.log', Logger::INFO));
+                Adldap::setLogger($logger);
+            }
             $adldap = new adLDAP;
-            $adldap->addProvider($this->stripMunkireportItemsFromConfig($this->config));
+
+            $adldap->addProvider(
+                $this->stripMunkireportItemsFromConfig($this->config),
+                $name = 'default'
+            );
 
             try {
                 $provider = $adldap->connect();
                 if($provider->auth()->attempt($login, $password, ! $this->bindAsAdmin())){
                     $search = $provider->search();
 
-                    $user = $search->users()->findOrFail($login);
+                    if ($this->schema instanceof ActiveDirectorySchema) {
+                        if (empty($this->config['account_suffix'])) {
+                            $user = $search->users()->findByOrFail('userPrincipalName', $login);
+                        } else {
+                            $user = $search->users()->findOrFail($login);
+                        }
+                    }
+                    else {
+                        $user = $search->users()->findByOrFail('uid', $login);
+                    }
                     $this->groups = $user->getGroupNames($this->recursiveGroupSearch());
 
                     $auth_data = [
@@ -44,6 +71,8 @@ class AuthAD extends AbstractAuth
                     return false;
 
                 }
+                
+
 
             } catch (Exception $e) {
                 error('An error occurred while contacting AD', 'error_contacting_AD');
@@ -60,7 +89,7 @@ class AuthAD extends AbstractAuth
 
     private function bindAsAdmin()
     {
-         return isset($this->config['admin_username']) && isset($this->config['admin_password']);
+         return $this->config['username'] && $this->config['password'];
     }
 
     private function recursiveGroupSearch()
@@ -75,7 +104,7 @@ class AuthAD extends AbstractAuth
 
     public function getAuthStatus()
     {
-        return $this->auth_status;
+        return $this->authStatus;
     }
 
     public function getUser()

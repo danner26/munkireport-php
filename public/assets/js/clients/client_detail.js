@@ -178,62 +178,13 @@ $(document).on('appReady', function(e, lang) {
 		// Remote control links
 		$.getJSON( appUrl + '/clients/get_links', function( links ) {
 			$.each(links, function(prop, val){
-				$('#client_links').append('<li><a href="'+(val.replace(/%s/, machineData.remote_ip).replace(/%u/, username))+'">'+i18n.t('remote_control')+' ('+prop+')</a></li>');
+				$('#client_links').append('<li><a href="'+(val.replace(/%s/, machineData.remote_ip).replace(/%remote_ip/, machineData.remote_ip).replace(/%u/, username).replace(/%network_ip_v4/, machineData.ipv4ip).replace(/%network_ip_v6/, machineData.ipv6ip))+'">'+i18n.t('remote_control')+' ('+prop+')</a></li>');
 			});
 		});
 
 
 	});
 
-	// Get estimate_manufactured_date
-	$.getJSON( appUrl + '/module/warranty/estimate_manufactured_date/' + serialNumber, function( data ) {
-		$('.mr-manufacture_date').html(data.date)
-	});
-
-
-	// Get services data
-	$.getJSON( appUrl + '/module/service/get_data/' + serialNumber, function( data ) {
-		if(data.length)
-		{
-			var content = $('<table>').addClass('table table-condensed table-striped');
-
-			// Set headers
-			content.append($('<thead>')
-					.append($('<tr>')
-						.append($('<th>')
-							.text(i18n.t('service.name')))
-						.append($('<th>')
-							.text(i18n.t('service.status')))));
-
-			// Load data
-			$.each(data, function(index, service){
-				content.append($('<tr>')
-					.append($('<td>')
-						.text(service.rs.service_name))
-					.append($('<td>')
-						.html(function(){
-							var cls = "success";
-							if(service.rs.service_state != 'running'){
-								cls = "warning";
-							}
-							return '<span class="label label-'+cls+'">'+service.rs.service_state+'</span>';
-						})));
-			});
-
-			// Add tab
-			var conf = {
-				id: 'service-tab',
-				linkTitle: i18n.t('service.tab.title'),
-				tabTitle: i18n.t('service.tab.title'),
-				tabContent: content
-			}
-			addTab(conf);
-
-			// Set correct tab on location hash
-			loadHash();
-
-		}
-	});
 
 	// -------------------------- BACKUP
 
@@ -266,7 +217,26 @@ $(document).on('appReady', function(e, lang) {
 					.append($('<th>')
 						.text(i18n.t('backup.duration')))
 					.append($('<td>')
-						.text(moment.duration(tmData.duration, "seconds").humanize())))
+						.text(function() {
+						    var duration = tmData.duration
+						    if(!duration){
+							return "";
+						    } else {
+							return moment.duration(tmData.duration, "seconds").humanize();
+						    }
+						})))
+							.append($('<tr>')
+								.append($('<th>')
+									.text(i18n.t('backup.last_failure_msg')))
+								.append($('<td>')
+						.text(function() {
+						    var message = tmData.last_failure_msg
+						    if(! message.startsWith("Backup failed with error ", 0) && message !== ""){
+							return i18n.t('timemachine.'+message);
+						    } else if (message.startsWith("Backup failed with error ", 0)) {
+							return message.replace("Backup failed with error ", "Error ");
+						    }
+						})))
 				.append($('<tr>')
 					.append($('<th>')
 						.text(i18n.t('backup.last_failure')))
@@ -319,62 +289,7 @@ $(document).on('appReady', function(e, lang) {
 
 	// -------------------------- END BACKUP
 
-	// Get ARD data
-	$.getJSON( appUrl + '/module/ard/get_data/' + serialNumber, function( data ) {
-		$.each(data, function(index, item){
-			if(/^text[\d]$/.test(index))
-			{
-				$('#ard-data')
-					.append($('<tr>')
-						.append($('<th>')
-							.text(index))
-						.append($('<td>')
-							.text(item)));
-			}
-		});
-	});
 
-	// Get Bluetooth data
-	$.getJSON( appUrl + '/module/bluetooth/get_data/' + serialNumber, function( data ) {
-		if(data.id !== '')
-		{
-			$('table.mr-bluetooth-table')
-				.empty()
-				.append($('<tr>')
-					.append($('<th>')
-						.text(i18n.t('bluetooth.status')))
-					.append($('<td>')
-						.text(function(){
-							if(data.bluetooth_power == 1){
-								return i18n.t('on');
-							}
-							if(data.bluetooth_power == 0){
-								return i18n.t('off');
-							}
-							if(data.bluetooth_power == -1){
-								return i18n.t('bluetooth.nobluetooth');
-							}
-							return i18n.t('unknown');
-						})));
-
-			for (key in data){
-				var rows = ''
-				if (key != 'bluetooth_power'){
-					rows = rows + '<tr><th>'+i18n.t('bluetooth.'+key)+'</th><td>'+data[key]+'%'+'</td></tr>'
-					$('table.mr-bluetooth-table').append(rows)
-				}
-			}
-		}
-		else{
-			$('table.mr-bluetooth-table')
-				.empty()
-				.append($('<tr>')
-					.append($('<td>')
-						.attr('colspan', 2)
-						.text(i18n.t('no_data'))))
-		}
-
-	});
 
 	// ------------------------------------ Hotkeys
 	// Use arrows to switch between tabs in client view
@@ -412,10 +327,6 @@ $(document).on('appReady', function(e, lang) {
 
 	// ------------------------------------ End Hotkeys
 
-
-	// ------------------------------------ Refresh machine description
-
-	$('.mr-refresh-desc').attr('href', appUrl + '/module/warranty/recheck_warranty/' + serialNumber);
 
 	// ------------------------------------ Tags
 	var currentTags = {}

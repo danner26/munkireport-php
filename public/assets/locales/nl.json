@@ -107,7 +107,7 @@
     "installed_third_party_software": "Geïnstalleerde Software van Derden",
     "install_date": "Installatie datum",
     "no_install_history": "Geen installatie historie",
-    "panel_title": "Client activity in the last month",
+    "panel_title": "Actieve machines in de laatste __number__ dagen",
     "process_name": "Procesnaam",
     "total": "Total Clients"
   },
@@ -232,11 +232,6 @@
   "manifest": {
     "name": "Manifest Naam"
   },
-  "memory": {
-    "memory": "Geheugen",
-    "usage": "Geheugengebruik",
-    "pressure": "Geheugendruk"
-  },
   "model": "Model",
   "munki": {
     "error": "Munki fout: __error__",
@@ -331,6 +326,7 @@
   "report": {
     "generate": "Generate Report"
   },
+  "physical_memory": "Geheugen",
   "printer": {
     "default_set": "Default Aan",
     "driver_version": "Driver Versie",

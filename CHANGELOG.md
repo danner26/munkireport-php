@@ -1,7 +1,595 @@
-### [3.1.1](https://github.com/munkireport/munkireport-php/compare/v3.1.0...HEAD) (Unreleased)
+### [5.1.5](https://github.com/munkireport/munkireport-php/compare/v5.1.4...HEAD) (Unreleased)
+
+Mostly module updates, and a small fix for apache servers.
+Security module now reports on Secure Boot and External Boot thanks to @poundbangbash Note that this change needs a database migration.
+
+MODULE UPDATES
+  - munkireport/reportdata (v2.3 => v2.4)
+  - munkireport/location (v1.1 => V1.2)
+  - munkireport/mdm_status (v1.7 => v1.9)
+  - munkireport/security (V1.5 => v1.6)
+  - munkireport/supported_os (v1.7 => V1.8)
+  - munkireport/user_sessions (v1.3 => V1.4)
+
+DEPENDENCY UPDATES
+  - symfony/yaml (v3.4.36 => v3.4.37)
+  - symfony/var-dumper (v4.4.2 => v4.4.4)
+  - tightenco/collect (v6.11.0 => v6.13.0)
+  - symfony/console (v4.4.2 => v4.4.4)
+  - symfony/process (v4.4.2 => v4.4.4)
+  - symfony/translation (v4.4.2 => v4.4.4)
+  - nesbot/carbon (2.28.0 => 2.29.1)
+  - symfony/finder (v4.4.2 => v4.4.4)
+
+
+### [5.1.4](https://github.com/munkireport/munkireport-php/compare/v5.1.3...v5.1.4) (January 20, 2020)
+
+This is a bug fix release. Most notable change: the model lookup now happens in the machine module and not in the warranty module anymore.
+
+FIXES
+- Remove deprecated get_magic_quotes_gps()
+- XSS fix in debug mode
+- Clean exit when server is unavailable
+
+MODULE UPDATES
+- munkireport/machine (v2.3 => v2.5)
+- munkireport/warranty (v2.1 => v2.2)
+- munkireport/fan_temps (v1.5 => V1.6)
+
+DEPENDENCY UPDATES
+- guzzlehttp/guzzle (6.4.1 => 6.5.2)
+- symfony/process (v4.3.7 => v4.4.2)
+- symfony/polyfill-php73 (v1.12.0 => v1.13.1)
+- symfony/polyfill-mbstring (v1.12.0 => v1.13.1)
+- symfony/console (v4.3.7 => v4.4.2)
+- symfony/translation (v4.3.7 => v4.4.2)
+- nesbot/carbon (2.26.0 => 2.28.0)
+- illuminate/contracts (v5.8.35 => v5.8.36)
+- illuminate/support (v5.8.35 => v5.8.36)
+- illuminate/console (v5.8.35 => v5.8.36)
+- illuminate/container (v5.8.35 => v5.8.36)
+- illuminate/database (v5.8.35 => v5.8.36)
+- symfony/finder (v4.3.7 => v4.4.2)
+- illuminate/filesystem (v5.8.35 => v5.8.36)
+- league/flysystem (1.0.57 => 1.0.63)
+- symfony/polyfill-ctype (v1.12.0 => v1.13.1)
+- symfony/yaml (v3.4.34 => v3.4.36)
+- symfony/polyfill-php72 (v1.12.0 => v1.13.1)
+- symfony/var-dumper (v4.3.7 => v4.4.2)
+- tightenco/collect (v6.4.1 => v6.11.0)
+- adldap2/adldap2 (v10.2.0 => v10.2.2)
+- onelogin/php-saml (3.3.1 => 3.4.1)
+- monolog/monolog (1.25.1 => 1.25.3)
+- doctrine/cache (1.9.0 => 1.10.0)
+- phpoption/phpoption (1.5.2 => 1.7.2)
+
+### [5.1.3](https://github.com/munkireport/munkireport-php/compare/v5.1.2...v5.1.3) (November 12, 2019)
+
+FEATURES
+  - Added an upgrade script (@lcsees)
+  - Added a docker compose example (@b-reich)
+
+FIXES
+  - MySQL port is now correctly used in admin panel
+  - Server timeout is now 60 seconds for slow servers
+  - Filter scripts for @ sign (Synology issue)
+  - LaunchDaemon changed to use KeepAlive instead of WatchPaths - should prevent the runner from starting twice
+  
+MODULE UPDATES
+  - munkireport/crashplan (v1.4 => V1.5)
+  - munkireport/managedinstalls (v2.2 => V2.3)
+
+DEPENDENCY UPDATES  
+  - guzzlehttp/guzzle (6.3.3 => 6.4.1)
+  - doctrine/event-manager (v1.0.0 => 1.1.0)
+  - doctrine/cache (v1.8.0 => 1.9.0)
+  - doctrine/dbal (v2.9.2 => v2.10.0)
+  - symfony/yaml (v3.4.32 => v3.4.33)
+  - symfony/var-dumper (v4.3.5 => v4.3.6)
+  - tightenco/collect (v6.3.0 => v6.4.1)
+  - psr/log (1.1.0 => 1.1.2)
+  - adldap2/adldap2 (v10.1.1 => v10.2.0)
+  - robrichards/xmlseclibs (3.0.3 => 3.0.4)
+  - onelogin/php-saml (3.3.0 => 3.3.1)
+  - symfony/service-contracts (v1.1.7 => v1.1.8)
+  - symfony/console (v4.3.5 => v4.3.6)
+  - symfony/process (v4.3.5 => v4.3.6)
+  - doctrine/inflector (v1.3.0 => 1.3.1)
+  - symfony/translation (v4.3.5 => v4.3.6)
+  - nesbot/carbon (2.25.2 => 2.26.0)
+  - symfony/finder (v4.3.5 => v4.3.6)
+  - phpoption/phpoption (1.5.0 => 1.5.2)
+
+### [5.1.2](https://github.com/munkireport/munkireport-php/compare/v5.1.1...v5.1.2) (October 19, 2019)
+
+Increase default script timeout to 30 seconds
+
+ MODULE UPDATES
+ - munkireport/security (v1.4 => V1.5)
+ 
+ DEPENDENCY UPDATES
+ - nesbot/carbon (2.25.1 => 2.25.2)
+ - league/flysystem (1.0.55 => 1.0.57)
+ - tightenco/collect (v6.2.0 => v6.3.0
+
+### [5.1.1](https://github.com/munkireport/munkireport-php/compare/v5.1.0...v5.1.1) (October 09, 2019)
+
+Notable changes: XSS patch, Catalina support for Storage report (@rickheil)
+filevault status rewrite (@tuxudo), mdm_status detail widget (@poundbangbash)
+
+FIXES
+- Prevent Cross Site Scripting attack (XSS) on login form
+
+MODULE UPDATES
+  - munkireport/disk_report (v2.4 => v2.7)
+  - munkireport/filevault_status (v1.1 => V1.2)
+  - munkireport/localadmin (v2.1 => v2.2)
+  - munkireport/mdm_status (v1.6 => v1.7)
+  - munkireport/network (v2.3 => v2.4)
+
+  DEPENDENCY UPDATES
+  - symfony/yaml (v3.4.31 => v3.4.32)
+  - symfony/var-dumper (v4.3.4 => v4.3.5)
+  - tightenco/collect (v6.0.3 => v6.2.0)
+  - symfony/service-contracts (v1.1.6 => v1.1.7)
+  - symfony/console (v4.3.4 => v4.3.5)
+  - symfony/process (v4.3.4 => v4.3.5)
+  - symfony/translation-contracts (v1.1.6 => v1.1.7)
+  - symfony/translation (v4.3.4 => v4.3.5)
+  - nesbot/carbon (2.24.0 => 2.25.1)
+  - symfony/finder (v4.3.4 => v4.3.5)
+
+
+### [5.1.0](https://github.com/munkireport/munkireport-php/compare/v5.0.1...v5.1.0) (September 24, 2019)
+
+Some bugfixes and a change on how the client summary tab is rendered. Removed legacy modules.
+
+NEW FEATURES
+- Customizable client summary tab https://github.com/munkireport/munkireport-php/wiki/Client-Summary-Tab
+
+FIXES
+- Fix issue with extra slashes in URL. Some web servers can't handle the double slash and fail. (#1275) @poundbangbash
+- Fix munkireport-runner: Add long_username and uid
+
+MODULE UPDATES
+  - Removed munkireport/service (v1.1)
+  - Removed munkireport/servermetrics (v1.1)
+  - munkireport/ard (v2.0 => 2.1)         
+  - munkireport/machine (v2.2 => v2.3)         
+  - munkireport/disk_report (v2.3 => v2.4)         
+  - munkireport/warranty (v2.0 => v2.1)         
+  - munkireport/appusage (v2.1 => v2.2)
+  - munkireport/bluetooth (v1.1 => v1.2)         
+  - munkireport/caching (v1.2 => v1.3)
+  - munkireport/comment (v2.0 => v2.1)         
+  - munkireport/crashplan (v1.2 => v1.4)         
+  - munkireport/detectx (v2.1 => v2.2)         
+  - munkireport/fan_temps (V1.4 => v1.5)         
+  - munkireport/localadmin (v2.0 => v2.1)         
+  - munkireport/network (v2.2 => v2.3)         
+  - munkireport/security (v1.3 => v1.4)         
+  - munkireport/timemachine (v1.3 => v1.4)         
+  - munkireport/user_sessions (v1.2 => v1.3)
+
+DEPENDENCY UPDATES
+  - adldap2/adldap2 (v10.1.0 => v10.1.1)         
+
+
+
+### [5.0.1](https://github.com/munkireport/munkireport-php/compare/v5.0.0...v5.0.1) (September 19, 2019)
+
+Small bugfix release which incorporates updated modules.
+
+MODULE_UPDATES
+  - munkireport/disk_report (v2.1 => v2.3)
+  - munkireport/certificate (v1.1 => v1.2)
+
+
+### [5.0.0](https://github.com/munkireport/munkireport-php/compare/v4.3.3...v5.0.0) (September 18, 2019)
+
+This release changes the way MunkiReport runs on the client. MunkiReport now has it's own launchDaemon, which means that it will no longer take up time when munki runs it's pre- and postflight scripts.
+The MunkiReport scripts have moved to `/usr/local/munkireport`
+MunkiReport log files are now found in `/Library/MunkiReport/Logs/`
+
+To take advantage of the new scripts, create a new client package and distribute to your munki clients.
+
+IMPORTANT
+MunkiReport does not run scripts in `/usr/local/munki/preflight.d`, `/usr/local/munki/postlight.d` and `/usr/local/munki/preflight_abort.d` anymore! If you depended on these locations, please consider creating your own implementation for these. Also note that MunkiReport will not clean up the legacy directories.
+
+MODULE UPDATES
+- munkireport/profile (v1.2 => v2.0)         
+- munkireport/machine (v2.1 => v2.2)         
+- munkireport/munkireport (3.0 => 3.1)         
+
+DEPENDENCY UPDATES
+- symfony/process (v4.3.4)         
+- symfony/service-contracts (v1.1.6)         
+- symfony/polyfill-php73 (v1.12.0)         
+- symfony/polyfill-mbstring (v1.11.0 => v1.12.0)
+- symfony/console (v3.4.29 => v4.3.4)         
+- symfony/translation-contracts (v1.1.6)
+- symfony/translation (v3.4.29 => v4.3.4)
+- nesbot/carbon (1.39.0 => 2.24.0)         
+- illuminate/contracts (v5.5.44 => v5.8.35)
+- doctrine/inflector (v1.2.0 => v1.3.0)         
+- illuminate/support (v5.5.44 => v5.8.35)
+- illuminate/console (v5.5.44 => v5.8.35)
+- illuminate/container (v5.5.44 => v5.8.35)
+- illuminate/database (v5.5.44 => v5.8.35)
+- symfony/finder (v3.4.29 => v4.3.4)         
+- illuminate/filesystem (v5.5.44 => v5.8.35)
+- league/flysystem (1.0.53 => 1.0.55)         
+- doctrine/event-manager (v1.0.0)         
+- doctrine/cache (v1.6.2 => v1.8.0)         
+- doctrine/dbal (v2.5.13 => v2.9.2)         
+- symfony/polyfill-ctype (v1.11.0 => v1.12.0)
+- vlucas/phpdotenv (v3.4.0 => v3.6.0)         
+- symfony/yaml (v3.4.29 => v3.4.31)         
+- symfony/polyfill-php72 (v1.12.0)         
+- symfony/var-dumper (v4.3.4)         
+- tightenco/collect (v6.0.3)         
+- adldap2/adldap2 (v10.0.11 => v10.1.0)         
+- onelogin/php-saml (3.2.1 => 3.3.0)         
+- monolog/monolog (1.24.0 => 1.25.1)
+
+### [4.3.4](https://github.com/munkireport/munkireport-php/compare/v4.3.3...v4.3.4) (July 27, 2019)
+
+A small fix concerning business units.
+
+FIXED
+- Detecting correct machine_groups for non-admin users
+
+### [4.3.3](https://github.com/munkireport/munkireport-php/compare/v4.3.2...v4.3.3) (July 25, 2019)
+
+Still dealing with the fallout from the 4.3.0RC2 release :-(
+
+FIXED
+- Deleting of events
+
+MODULE UPDATES
+- munkireport/munkireport (v2.2 => 3.0)
+- munkireport/network (v2.1 => v2.2)
+
+
+### [4.3.2](https://github.com/munkireport/munkireport-php/compare/v4.3.1...v4.3.2) (July 18, 2019)
+
+Fix for reportdata and managedinstalls not logging events
+
+MODULE UPDATES
+  - munkireport/reportdata (v2.2 => v2.3)
+  - munkireport/managedinstalls (v2.1 => v2.2)
+
+
+### [4.3.1](https://github.com/munkireport/munkireport-php/compare/v4.3.1...v4.3.1) (July 18, 2019)
+
+Fix for event module not showing correct data
+
+MODULE UPDATES
+  - event (v3.0 => v3.1)
+
+
+### [4.3.0RC2](https://github.com/munkireport/munkireport-php/compare/v4.2.2...v4.3.0RC2) (July 17, 2019)
+
+This update changes the way some of the database queries are handled. Speed improvements for installhistory and inventory by chunking inserts.
+
+MODULE UPDATES
+  - event (v2.1 => v3.0)
+  - warranty (v1.2 => v2.0)
+  - comment (v1.1 => v2.0)
+  - gsx (v1.2 => v2.0)
+  - installhistory (v1.1 => v2.0)
+  - inventory (v2.2 => v3.0)
+  - reportdata (v1.5 => v2.2)
+  - machine (v1.3 => v2.1)
+  - detectx (v2.0 => v2.1)
+  - managedinstalls (v1.2 => v2.1)
+  - network (v1.4 => v2.1)
+  - tag (v1.1 => v2.1)
+
+
+  DEPENDENCY UPDATES
+  - onelogin/php-saml (3.1.1 => 3.2.1)
+
+
+### [4.2.2](https://github.com/munkireport/munkireport-php/compare/v4.2.1...v4.2.2) (July 06, 2019)
+
+FIXES
+- munkireport module (again)
+
+### [4.2.1](https://github.com/munkireport/munkireport-php/compare/v4.2.0...v4.2.1) (July 06, 2019)
+
+FIXES
+- munkireport module
+
+### [4.2.0](https://github.com/munkireport/munkireport-php/compare/v4.1.3...v4.2.0) (July 05, 2019)
+
+This release contains a couple of internal improvements to make developer life easier.
+
+CHANGES
+- Developers can now use `module_processor.php` to process the client data. See for example https://github.com/munkireport/munkireport/blob/master/munkireport_processor.php
+- Support for Eloquent Models. See for example https://github.com/munkireport/munkireport/blob/master/munkireport_model.php For more info see https://laravel.com/docs/5.8/eloquent
+- Support for new listing format See https://github.com/munkireport/munkireport-php/wiki/Module-listings
+
+MODULE UPDATES
+- munkireport/ard (v1.1 => v2.0)
+- munkireport/munkireport (v1.4 => v2.0)
+- munkireport/detectx (v1.6 => v2.0)
+- munkireport/displays_info (v1.3.3 => v2.0)
+- munkireport/localadmin (v1.2 => v2.0)
+- munkireport/machine (v1.2 => v1.3)
+- munkireport/event (v1.2 => v2.1)
+- munkireport/disk_report (v1.3 => v2.1)
+- munkireport/appusage (v1.1 => v2.1)
+- munkireport/inventory (v1.3 => v2.2)
+
+DEPENDENCY UPDATES
+- symfony/yaml (v3.4.28 => v3.4.29)
+- symfony/translation (v3.4.28 => v3.4.29)
+- nesbot/carbon (1.38.4 => 1.39.0)
+- ralouphie/getallheaders (2.0.5 => 3.0.3)
+- guzzlehttp/psr7 (1.5.2 => 1.6.1)
+- symfony/debug (v3.4.28 => v3.4.29)
+- symfony/console (v3.4.28 => v3.4.29)
+- symfony/finder (v3.4.28 => v3.4.29)
+
+
+### [4.1.3](https://github.com/munkireport/munkireport-php/compare/v4.1.2...v4.1.3) (June 22, 2019)
+
+Small update with some improvement in the modules. The event module now allows for filtering events in the messages pane (see: https://github.com/munkireport/event/blob/master/README.md#configuration-file) Thanks to MDOYVR 2019 Hack Night! MatX: you rock!
+
+supported_os gained reporting on macOS 10.15 aka Catalina.
+
+MODULE UPDATES
+- reportdata (v1.4 => v1.5)
+- event (v1.1 => v1.2)
+- detectx (v1.5 => v1.6)
+- localadmin (v1.1 => v1.2)
+- softwareupdate (v1.2 => v1.2.1)
+- supported_os (v1.5 => v1.7)
+
+DEPENDENCY UPDATES
+- league/flysystem (1.0.51 => 1.0.53)
+- vlucas/phpdotenv (v3.3.3 => v3.4.0)
+- symfony/translation (v3.4.27 => v3.4.28)
+- nesbot/carbon (1.37.1 => 1.38.4)
+- adldap2/adldap2 (v10.0.10 => v10.0.11)
+- symfony/debug (v3.4.27 => v3.4.28)
+- symfony/console (v3.4.27 => v3.4.28)
+- symfony/finder (v3.4.27 => v3.4.28)
+- doctrine/lexer (v1.0.1 => 1.0.2)
+
+
+### [4.1.2](https://github.com/munkireport/munkireport-php/compare/v4.1.1...v4.1.2) (May 07, 2019)
+
+Small update to fix the deleting of client machines.
+
+FIXES
+- Fix deleting of machines
+
+MODULE UPDATES
+- managedinstalls (v1.1 => v1.2)
+
+DEPENDENCY UPDATES
+- nesbot/carbon (1.36.2 => 1.37.1)
+- adldap2/adldap2 (v10.0.8 => v10.0.10)
+
+
+### [4.1.1](https://github.com/munkireport/munkireport-php/compare/v4.1.0...v4.1.1) (May 01, 2019)
+
+FIXES
+- Fix Widget Gallery uninitialized variables
+- Fix Sophos module uninitialized variables
+- Fix Caching module uninitialized variables
+
+MODULE UPDATES
+- caching (v1.1 => v1.2)
+- fan_temps (v1.3 => V1.4)
+- munkireportinfo (v1.2 => v1.3)
+- sophos (v1.1 => v1.2)
+
+### [4.1.0](https://github.com/munkireport/munkireport-php/compare/v4.0.2...v4.1.0) (April 11, 2019)
+
+FIXES
+- Change 'memory' localization name (#1210) @tuxudo
+- Error handling for deleting machines.
+- Added Time Machine errors back to client summary (#1211) @tuxudo
+- Localize Delete button on business unit management (#1141) @tuxudo
+- Added additional OneLogin supported parameters (#1214)
+- Update SAML (#1244)
+
+NEW FEATURES
+- 'f' hotkey for filter modal (#1150) @tuxudo
+- Added logging for adldap2
+- Added AirPlay to vendors (#1234) @tuxudo
+- Make showing help link default to true (#1228) @WardsParadox
+- Add Widget Gallery (#1140) @tuxudo
+
+MODULE UPDATES
+- machine (v1.1 => v1.2)
+- disk_report (v1.2 => v1.3)
+- displays_info (v1.3 => v1.3.3)
+- fan_temps (v1.1 => v1.3)
+- ibridge (v1.2 => v1.4)
+- munki_facts (v1.2 => v1.3)
+- munkireportinfo (v1.1 => v1.2)
+- profile (v1.1 => v1.2)
+- softwareupdate (v1.1 => v1.2)
+- supported_os (v1.3 => v1.5)
+- timemachine (v1.2 => v1.3)
+
+### [4.0.2](https://github.com/munkireport/munkireport-php/compare/v4.0.1...v4.0.2) (February 08, 2019)
+
+FIXES
+- Updated config_to_env conversion script
+- Added manager role
+
+NEW FEATURES
+- Docker builds PHP v7.3
+- Added SSL options (to address #1217)
+- Added mdm_status module
+
+
+### [4.0.1](https://github.com/munkireport/munkireport-php/compare/v4.0.0...v4.0.1) (December 21, 2018)
+
+FIXES
+- `APPS_TO_TRACK` now working again due to an upgrade to the `inventory` module.
+- Added `.env.example` to the `.zip` and `tar.gz` downloads.
+CHANGES
+- Added support for local widgets.
+- Removed `custom_folder` as a method to load custom widgets. As a replacement, use `local/views/widgets`. Or override `WIDGET_SEARCH_PATHS` with your own paths.
+- Hotkeys are displayed in the dashboard dropdown if more than one dashboard is configured
+- There are 2 new widgets added to the `munkireport` module that show the top 10 error and warning messages.
+
+### [4.0.0](https://github.com/munkireport/munkireport-php/compare/v3.3.1...v4.0.0) (December 18, 2018)
+
+IMPORTANT CHANGES
+
+- This release changes the entire configuration system to `.env`. This means that `config.php` and `config_default.php` are no longer in use.
+- There is a new directory called `local` that is used for user accounts, dashboards, certificates and module specific yaml files.
+
+Please read https://github.com/munkireport/munkireport-php/wiki/How-to-Upgrade-Versions#version-3x---4x for more information
+
+FIXES
+- Fixing the Listing title (#1194) @joncrain
+- Removing unnecessary data (#1195) @joncrain
+- Including preset curl options by default (#1197) @joncrain
+- Added local users config info to .env.example and README.md (#1204) @fridomac
+
+OTHER CHANGES
+- SAML attribute mapping for user and groups
+- The `adldap2/adldap2` and `onelogin/php-saml` libraries are updated to the latest version and included in the default installation.
+
+### [3.3.1](https://github.com/munkireport/munkireport-php/compare/v3.3.0...v3.3.1) (November 27, 2018)
+
+FIXES
+- `build/add_module.sh`
+
+CHANGES
+- Update docker files (#1192)
+- Moved config items to their respective modules
+
+NOTES
+- Docker users: renamed MR_SITENAME to SITENAME and MR_MODULES to MODULES
+
+### [3.3.0](https://github.com/munkireport/munkireport-php/compare/v3.2.6...v3.3.0) (November 20, 2018)
+
+FIXES
+- Fix Database sizing (#1177)
+
+NEW FEATURES
+- Add module search path (#1187)
+- Modules are split off into separate repos
+- Added composer-merge plugin (allows for local composer.json file)
+
+### [3.2.6](https://github.com/munkireport/munkireport-php/compare/v3.2.5...v3.2.6) (November 08, 2018)
+
+FIXES
+- detectx I ❤️ u
+
+### [3.2.5](https://github.com/munkireport/munkireport-php/compare/v3.2.4...v3.2.5) (November 07, 2018)
+
+FIXES
+- Fixed detectx migration - again
+
+### [3.2.4](https://github.com/munkireport/munkireport-php/compare/v3.2.3...v3.2.4) (November 06, 2018)
+
+FIXES
+- Fixed detectx migration
+
+### [3.2.3](https://github.com/munkireport/munkireport-php/compare/v3.2.2...v3.2.3) (November 03, 2018)
+
+FIXES
+- Add magic_keyboard_with_numeric_keypad to bluetooth locale
+- Removed app_usage widget from managedinstalls... (#1138) @tuxudo
+- Detectx patch (#1137) @WardsParadox
+- Localize ARD Text on client summary (#1132) @tuxudo
+- Added space to paths that had space removed. (#1124) @poundbangbash
+- Updated current highest OS (#1123) @tuxudo
+- Fixed menu sorting case sensitivity (#1121) @tuxudo
+- Corrected devtools install script (#1114) @tuxudo
+- Added support for machine groups (#1144) @tuxudo
+- Remove group check from AuthSaml.php
+- Added machine group filtering to munki_facts widget (#1158) @tuxudo
+- Add machine group filtering (#1157) @tuxudo
+- Minor database fixes
+- Add port to MySQL dsn
+- Fixed clickthrough button URLs (#1153) @tuxudo
+- Fixed storage listing loading column count (#1151) @tuxudo
+- Fixed for Macs without Metal support (#1169) @tuxudo
+
+NEW FEATURES
+- Show machine group name instead of number (#1129) @tuxudo
+- Added version of database server (#1128) @WardsParadox
+- Add support for default theme (#1131) @tuxudo
+- Added more USB devices (#1165) @tuxudo
+
+NEW MODULES
+- Added iBridge module (#1116) @tuxudo
+
+### [3.2.2](https://github.com/munkireport/munkireport-php/compare/v3.2.1...v3.2.2) (July 08, 2018)
+
+FIXES
+- SentinelOne uninstallers
+- MigrationsPending (#1108) @mosen
+- Smart widget ui fix (#1107) @poundbangbash
+
+### [3.2.1](https://github.com/munkireport/munkireport-php/compare/v3.2.0...v3.2.1) (July 05, 2018)
+
+FIXES
+- Addressed duplication of ARD groups. (#1106) @poundbangbash
+- Security module fix ard_users - add nested ard_groups (#1105) @poundbangbash
+- Fix for issue #1102 @tuxudo
+- Improvements to Sophos module (#1100) @rickheil
+
+### [3.2.0](https://github.com/munkireport/munkireport-php/compare/v3.1.1...v3.2.0) (July 01, 2018)
+
+FIXES
+- detectx @WardsParadox
+- backup2go list view fix (#1056) @pnerum
+- Make the SIP check more resilient (#1063) @barn-stripe
+- Drop Down the Login Page (#1062) @gmarnin
+- Add disable_sso_sls_verify config option (#1007) @sphen13
+- Fixed localized event message (#1051) @tuxudo
+- Actually fix security.py module (#1068) @barn-stripe
+- Fix for Find My Macs widget not supporting business units (#1067) @tuxudo
+- Fixed apps tab order (#1069) @tuxudo
+- Added basic crypt checkin url (#1077) @WardsParadox
+- Hotfix/migration patches (#1087) @mosen
+- Fix for no workflow title (#1082) @tuxudo
+- AD Auth (#1096) @mosen
+- Removing Machine-Groups/Business Units (#1097) @mosen
+- Changed Extensions add teamid column method (#1098) @tuxudo
+
+NEW FEATURES
+- Help button @danner26
+- phpdotenv support (#1032) @mosen
+- Added advanced SAML settings
+- Adds Metal support to GPU module (#1058) @tuxudo
+- Added ability to skip bundle IDs in Appusage module (#1055) @tuxudo
+- Profile count report (#1030) @poundbangbash
+- Added local network ip option for vnc and ssh links (#1029) @poundbangbash
+- Added another USB device type (#1022) @tuxudo
+- Add column to filter bound status against (#1065) @poundbangbash
+- Add UID to reportdata, user_sessions module, localadmin module @poundbangbash
+- Add check network based users added to com.apple.local.ard_interact (#1071) @poundbangbash
+- Free ipa support (#1080)
+- Implement db size calcs (#1094)
+
+NEW MODULES
+- Devtools Module (#913) @tuxudo
+- Highest Supported OS module (#834) @tuxudo
+- Sophos Anti-virus module (#1093) @rickheil
+- SentinelOne (#1072) @poundbangbash
+- SentinelOne Quarantine module (@1073) @poundbangbash
+
+### [3.1.1](https://github.com/munkireport/munkireport-php/compare/v3.1.0...v3.1.1) (March 23, 2018)
 
 FIXES
 - filevault escrow migration
+
+NEW FEATURES
+- Travis CI integration (#1031) @danner26
+- Added support for server-side IP filtering (#990) @danner26
 
 ### [3.1.0](https://github.com/munkireport/munkireport-php/compare/v3.0.2...v3.1.0) (March 21, 2018)
 

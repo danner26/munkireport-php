@@ -10,7 +10,7 @@ class AuthHandler
     // Authentication mechanisms we handle => classname
     private $mechanisms = [
         'noauth' => 'AuthNoauth',
-        'config' => 'AuthConfig',
+        'local' => 'AuthLocal',
         'ldap' => 'AuthLDAP',
         'AD' => 'AuthAD',
         'saml' => 'AuthSaml'];
@@ -122,7 +122,7 @@ class AuthHandler
         $_SESSION['role_why'] = 'Default role';
 
         // Find role in config for current user
-        foreach (conf('roles', array()) as $role => $members) {
+        foreach (conf('roles') as $role => $members) {
         // Check for wildcard
             if (in_array('*', $members)) {
                 $_SESSION['role'] = $role;
@@ -191,8 +191,13 @@ class AuthHandler
             // Can access all defined groups (from machine_group)
                 // and used groups (from reportdata)
                 $mg = new Machine_group;
-                $report = new Reportdata_model;
-                $_SESSION['machine_groups'] = array_unique(array_merge($report->get_groups(), $mg->get_group_ids()));
+                $machine_groups = Reportdata_model::select('machine_group')
+                    ->groupBy('machine_group')
+                    ->get()
+                    ->pluck('machine_group')
+                    ->toArray();
+                $machine_groups = $machine_groups ? $machine_groups : [0];
+                $_SESSION['machine_groups'] = array_unique(array_merge($machine_groups, $mg->get_group_ids()));
             } else {
                 // Only get machine_groups for business unit
                 $_SESSION['machine_groups'] = $bu->get_machine_groups($bu->unitid);
@@ -207,3 +212,4 @@ class AuthHandler
     }
 
 }
+

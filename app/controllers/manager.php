@@ -2,7 +2,7 @@
 
 namespace munkireport\controller;
 
-use \Controller, \View, \Machine_model;
+use \Controller, \View, \Model, \Exception;
 
 class manager extends Controller
 {
@@ -40,7 +40,7 @@ class manager extends Controller
             $status['status'] = 'unauthorized';
         } else {
             // Delete machine entry from all tables
-            $machine = new Machine_model();
+            $machine = new Model;
 
             // List tables (unfortunately this is not db-agnostic)
             switch ($machine->get_driver()) {
@@ -94,7 +94,7 @@ class manager extends Controller
                 $status['rowcount'] = $cnt;
             } catch (Exception $e) {
                 $status['status'] = 'error';
-                $status['message'] = $e->getMessage();
+                $status['message'] = sprintf('Delete failed for table %s: %s', $table, $e->getMessage());
             }
         }
 

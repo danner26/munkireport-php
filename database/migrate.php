@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../app/helpers/env_helper.php';
+require_once __DIR__ . '/../app/helpers/site_helper.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use Illuminate\Filesystem\Filesystem;
@@ -7,8 +9,6 @@ use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use munkireport\lib\Modules as ModuleMgr;
 
-define('KISS', 1);
-define('FC', __FILE__ .'/../' );
 define('PUBLIC_ROOT', dirname(__FILE__) . '/public' );
 define('APP_ROOT', dirname(__FILE__) . '/../' );
 
@@ -25,36 +25,41 @@ function colorize($string){
     return str_replace(array_keys($colorTable), array_values($colorTable), $string);
 }
 
-function load_conf()
+function ensure_sqlite_db_exists($connection)
 {
-	$conf = array();
-
-	$GLOBALS['conf'] =& $conf;
-
-	// Load default configuration
-	require_once(APP_ROOT . "config_default.php");
-
-	if ((include_once APP_ROOT . "config.php") !== 1)
-	{
-		die(APP_ROOT. "config.php is missing!\n
-	Unfortunately, Munkireport does not work without it\n");
-	}
+  touch($connection['database']);
 }
 
-function conf($cf_item, $default = '')
-{
-	return array_key_exists($cf_item, $GLOBALS['conf']) ? $GLOBALS['conf'][$cf_item] : $default;
+require_once APP_ROOT . 'app/helpers/config_helper.php';
+initDotEnv();
+initConfig();
+configAppendFile(APP_ROOT . 'app/config/app.php');
+configAppendFile(APP_ROOT . 'app/config/db.php', 'connection');
+
+$connection = conf('connection');
+
+if(has_sqlite_db($connection)){
+  ensure_sqlite_db_exists($connection);
 }
 
-load_conf();
-
-$capsule = new Capsule();
-$capsule->addConnection(conf('connection'));
-$capsule->setAsGlobal();
-$repository = new DatabaseMigrationRepository($capsule->getDatabaseManager(), 'migrations');
-if (!$repository->repositoryExists()) {
-    $repository->createRepository();
+if(has_mysql_db($connection)){
+  add_mysql_opts($connection);
 }
+
+try {
+  $capsule = new Capsule();
+  $capsule->addConnection($connection);
+  $capsule->setAsGlobal();
+  $repository = new DatabaseMigrationRepository($capsule->getDatabaseManager(), 'migrations');
+  if (!$repository->repositoryExists()) {
+      $repository->createRepository();
+  }
+} catch (\Exception $e) {
+  echo $e->getMessage();
+  exit();
+}
+
+
 
 $files = new \Illuminate\Filesystem\Filesystem();
 $migrator = new Migrator($repository, $capsule->getDatabaseManager(), $files);
@@ -70,15 +75,17 @@ foreach($moduleMgr->getInfo() as $moduleName => $info){
     }
 }
 $error = '';
+
+$input = new \Symfony\Component\Console\Input\StringInput('');
+$outputSymfony = new \Symfony\Component\Console\Output\ConsoleOutput();
+$outputStyle = new \Illuminate\Console\OutputStyle($input, $outputSymfony);
+
 try {
-    $migrationFiles = $migrator->run($migrationDirList, ['pretend' => false]);
+    $migrationFiles = $migrator->setOutput($outputStyle)->run($migrationDirList, ['pretend' => false]);
 } catch (\Exception $exception) {
     $error = sprintf(colorize("<error>ERROR: %s</error>\n"), $exception->getMessage());
 }
 
-foreach($migrator->getNotes() as $note){
-    echo colorize($note)."\n";
-}
 if($error){
     echo $error;
 }

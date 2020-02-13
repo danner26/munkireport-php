@@ -8,16 +8,29 @@
 // Optionally:
 // 'view_vars' => array with variables to pass to the views
 // 'badge' => id of a badge for this tab
-$tab_list = array(
-	'summary' => array('view' => 'client/summary_tab', 'i18n' => 'client.tab.summary'),
-);
+$tab_list = [
+	'summary' => [
+		'view' => 'client/summary_tab',
+		'view_vars' => [
+			'widget_list' => [],
+		],
+		'i18n' => 'client.tab.summary',
+	],
+];
 
 // Include module tabs
 $modules = getMrModuleObj()->loadInfo();
 $modules->addTabs($tab_list);
 
 // Add custom tabs
-$tab_list = array_merge($tab_list, conf('client_tabs', array()));
+$tab_list = array_merge($tab_list, conf('client_tabs', []));
+
+// Add widgets to summary tab
+$modules->addWidgets(
+	$tab_list['summary']['view_vars']['widget_list'],
+	conf('detail_widget_list', [])
+);
+
 
 ?>
 
@@ -77,7 +90,7 @@ $tab_list = array_merge($tab_list, conf('client_tabs', array()));
 			<?php foreach($tab_list as $name => $data):?>
 
 				<div class="tab-pane <?php if(isset($data['class'])):?>active<?php endif?>" id='<?php echo $name?>'>
-					<?php $this->view($data['view'], isset($data['view_vars'])?$data['view_vars']:array(), isset($data['view_path'])?$data['view_path']:VIEW_PATH);?>
+					<?php $this->view($data['view'], isset($data['view_vars'])?$data['view_vars']:array(), isset($data['view_path'])?$data['view_path']:conf('view_path'));?>
 				</div>
 
 			<?php endforeach?>
@@ -92,6 +105,5 @@ $tab_list = array_merge($tab_list, conf('client_tabs', array()));
 <script src="<?php echo conf('subdirectory'); ?>assets/js/typeahead.bundle.min.js"></script>
 <script src="<?php echo conf('subdirectory'); ?>assets/js/marked.min.js"></script>
 <script src="<?php echo conf('subdirectory'); ?>assets/js/munkireport.comment.js"></script>
-<script src="<?php echo conf('subdirectory'); ?>assets/js/munkireport.storageplot.js"></script>
 
 <?php $this->view('partials/foot'); ?>

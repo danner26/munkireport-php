@@ -1,9 +1,9 @@
 <?php
 
-use munkireport\models\Machine_group, munkireport\lib\Modules;
+use munkireport\models\Machine_group, munkireport\lib\Modules, munkireport\lib\Dashboard;
 
 // Munkireport version (last number is number of commits)
-$GLOBALS['version'] = '3.1.1.3364';
+$GLOBALS['version'] = '5.1.5.3921';
 
 // Return version without commit count
 function get_version()
@@ -74,13 +74,19 @@ function getdbh()
     if (! isset($GLOBALS['dbh'])) {
         try {
             $conn = conf('connection');
+            if($conn['options']){
+                $conn['options'] = arrayToAssoc($conn['options']);
+            }
             switch ($conn['driver']) {
                 case 'sqlite':
                     $dsn = "sqlite:{$conn['database']}";
                     break;
 
                 case 'mysql':
-                    $dsn = "mysql:host={$conn['host']};dbname={$conn['database']}";
+                    $dsn = "mysql:host={$conn['host']};port={$conn['port']};dbname={$conn['database']}";
+                    if( empty($conn['options'])){
+                      add_mysql_opts($conn);
+                    }
                     break;
 
                 default:
@@ -88,9 +94,9 @@ function getdbh()
             }
             $GLOBALS['dbh'] = new PDO(
                 $dsn,
-                isset($conn['username']) ? $conn['username'] : '',
-                isset($conn['password']) ? $conn['password'] : '',
-                isset($conn['options']) ? $conn['options'] : []
+                $conn['username'],
+                $conn['password'],
+                $conn['options']
             );
         } catch (PDOException $e) {
             fatal('Connection failed: '.$e->getMessage());
@@ -105,6 +111,46 @@ function getdbh()
         }
     }
     return $GLOBALS['dbh'];
+}
+
+function has_sqlite_db($connection)
+{
+  return find_driver($connection, 'sqlite');
+}
+
+function has_mysql_db($connection)
+{
+  return find_driver($connection, 'mysql');
+}
+
+function find_driver($connection, $driver)
+{
+  if( isset($connection['driver']) && $connection['driver'] == $driver){
+    return true;
+  }
+  return false;
+}
+
+function dumpQuery($queryobj){
+    dd(
+        vsprintf(
+            str_replace(['?'], ['\'%s\''], $queryobj->toSql()),
+            $queryobj->getBindings()
+        )
+    );
+}
+
+function add_mysql_opts(&$conn){
+  $conn['options'] = [
+    PDO::MYSQL_ATTR_INIT_COMMAND => sprintf('SET NAMES %s COLLATE %s', $conn['charset'], $conn['collation'])
+  ];
+  if($conn['ssl_enabled']){
+    foreach(['key', 'cert', 'ca', 'capath', 'cipher'] as $ssl_opt){
+      if($conn['ssl_'. $ssl_opt]){
+        $conn['options'][constant('PDO::MYSQL_ATTR_SSL_'.strtoupper($ssl_opt))] = $conn['ssl_'. $ssl_opt];
+      }
+    }
+  }
 }
 
 //===============================================
@@ -128,9 +174,10 @@ function munkireport_autoload($classname)
 function url($url = '', $fullurl = false, $queryArray = [])
 {
     $s = $fullurl ? conf('webhost') : '';
-    $s .= conf('subdirectory').($url && INDEX_PAGE ? INDEX_PAGE.'/' : INDEX_PAGE) . ltrim($url, '/');
+    $index_page = conf('index_page');
+    $s .= conf('subdirectory').($url && $index_page ? $index_page.'/' : $index_page) . ltrim($url, '/');
     if($queryArray){
-        $s .= (INDEX_PAGE ? '&amp;' : '?') .http_build_query($queryArray, '', '&amp;');
+        $s .= ($index_page ? '&amp;' : '?') .http_build_query($queryArray, '', '&amp;');
     }
     return $s;
 }
@@ -179,7 +226,6 @@ function redirect($uri = '', $method = 'location', $http_response_code = 302)
     if (! preg_match('#^https?://#i', $uri)) {
         $uri = url($uri);
     }
-
     switch ($method) {
         case 'refresh':
             header("Refresh:0;url=".$uri);
@@ -243,6 +289,44 @@ function get_guid()
 }
 
 /**
+ * Convert an array of values to a key => value array
+ * [a, b] is converted to [a => b]
+ *
+ * @return array assoc array
+ * @author
+ **/
+function arrayToAssoc($array)
+{
+    if(count($array) % 2){
+      throw new \Exception("Cannot convert array: array is of uneven length", 1);
+    }
+    $result = [];
+    while (count($array)) {
+        list($key, $value) = array_splice($array, 0, 2);
+        $result[$key] = $value;
+    }
+    return $result;
+}
+
+/**
+ * Convert a key => value array to an array of values
+ * [a => b] is converted to [a, b]
+ *
+ * @return array array
+ * @author
+ **/
+function assocToArray($array)
+{
+    $result = [];
+    foreach($array as $k => $v)
+    {
+      $result[] = $k;
+      $result[] = $v;
+    }
+    return $result;
+}
+
+/**
  * Check if current user may access data for serial number
  *
  * @return boolean TRUE if authorized
@@ -267,9 +351,13 @@ function authorized_for_serial($serial_number)
 function get_machine_group($serial_number = '')
 {
     if (! isset($GLOBALS['machine_groups'][$serial_number])) {
-        $reportdata = new Reportdata_model;
-        if ($reportdata->retrieveOne('serial_number=?', $serial_number)) {
-            $GLOBALS['machine_groups'][$serial_number] = $reportdata->machine_group;
+        
+        $machine_group = Reportdata_model::select('machine_group')
+            ->where('serial_number', $serial_number)
+            ->pluck('machine_group')
+            ->first();
+        if ($machine_group) {
+            $GLOBALS['machine_groups'][$serial_number] = $machine_group;
         } else {
             $GLOBALS['machine_groups'][$serial_number] = 0;
         }
@@ -312,7 +400,7 @@ function get_machine_group_filter($prefix = 'WHERE', $reportdata = 'reportdata')
 
     // Get filtered groups
     if ($groups = get_filtered_groups()) {
-        return sprintf('%s %s.machine_group IN (%s)', $prefix, $reportdata, implode(', ', $groups));
+        return sprintf(' %s %s.machine_group IN (%s) ', $prefix, $reportdata, implode(', ', $groups));
     } else // No filter
     {
         return '';
@@ -355,20 +443,38 @@ function get_filtered_groups()
  **/
 function store_event($serial, $module = '', $type = '', $msg = 'no_message', $data = '')
 {
-    $evtobj = new Event_model($serial, $module);
-    $evtobj->store($type, $msg, $data);
+    Event_model::updateOrCreate(
+        [
+            'serial_number' => $serial,
+            'module' => $module,
+        ],
+        [
+            'type' => $type,
+            'msg' => $msg,
+            'data' => $data,
+            'timestamp' => time(),
+        ]
+    );
 }
 
 /**
  * Delete event for client
  *
- * @param string $serial serial number
+ * @param string $serial_number serial number
  * @param string $module reporting module
  **/
-function delete_event($serial, $module = '')
+function delete_event($serial_number, $module = '')
 {
-    $evtobj = new Event_model();
-    $evtobj->reset($serial, $module);
+    if (! authorized_for_serial($serial_number)) {
+        return false;
+    }
+
+    $where[] = ['serial_number', $serial_number];
+    if ($module) {
+        $where[] = ['module', $module];
+    }
+
+    return Event_model::where($where)->delete();
 }
 
 // Truncate string
@@ -391,4 +497,16 @@ function getMrModuleObj()
     }
 
     return $moduleObj;
+}
+
+// Create a singleton dashboard
+function getDashboard()
+{
+    static $dashboardObj;
+
+    if( ! $dashboardObj){
+      $dashboardObj = new Dashboard(conf('dashboard'));
+    }
+
+    return $dashboardObj;
 }
